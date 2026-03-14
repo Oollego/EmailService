@@ -66,5 +66,17 @@ namespace EmailService.Infrastructure.Persistence
         {
             return await _context.EmailLogs.FindAsync(id);
         }
+
+        public async Task<List<EmailLog>> GetPendingEmailsAsync(int maxRetryCount)
+        {
+            return await _context.EmailLogs
+                .Where(x =>
+                    !x.IsSent &&
+                    x.RetryCount < maxRetryCount &&
+                    x.NextRetryAt <= DateTime.UtcNow)
+                .OrderBy(x => x.NextRetryAt)
+                .Take(100)
+                .ToListAsync();
+        }
     }
 }
