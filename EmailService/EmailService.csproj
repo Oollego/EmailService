@@ -19,13 +19,11 @@
   <ItemGroup>
     <Folder Include="Application\DTO\" />
     <Folder Include="Application\Validators\" />
-    <Folder Include="Application\Services\" />
     <Folder Include="Domain\Enums\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Infrastructure\EmailProviders\" />
     <Folder Include="Infrastructure\Logging\" />
     <Folder Include="Infrastructure\Templates\" />
-    <Folder Include="Worker\" />
   </ItemGroup>
 
 </Project>

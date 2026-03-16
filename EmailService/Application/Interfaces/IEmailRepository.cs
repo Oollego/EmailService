@@ -12,11 +12,9 @@ namespace EmailService.Application.Interfaces
 
         Task<bool> ExistsByIdempotencyKeyAsync(string key);
 
-        Task<List<EmailLog>> GetPendingEmailAsync(int maxRetryCount);
+        Task<List<EmailLog>> GetPendingEmailsAsync(int maxRetryCount);
 
         Task<EmailLog?> GetByIdAsync(Guid id);
-
-        Task<List<EmailLog>> GetPendingEmailsAsync(int maxRetryCount);
 
     }
 }
