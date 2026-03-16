@@ -50,33 +50,24 @@ namespace EmailService.Infrastructure.Persistence
 
         public async Task<bool> ExistsByIdempotencyKeyAsync(string key)
         {
-            return await _context.EmailLogs.AnyAsync(x => x.Id.ToString() == key);
+            return await _context.EmailLogs.AnyAsync(x => x.IdempotencyKey == key);
         }
 
         public async Task<List<EmailLog>> GetPendingEmailsAsync(int maxRetryCount)
         {
             return await _context.EmailLogs
-                .Where(x => !x.IsSent && x.RetryCount < maxRetryCount)
-                .OrderBy(x => x.CreatedAt)
-                .Take(100)
-                .ToListAsync();
+                    .Where(x =>
+                        !x.IsSent &&
+                        x.RetryCount < maxRetryCount &&
+                        x.NextRetryAt <= DateTime.UtcNow)
+                    .OrderBy(x => x.NextRetryAt)
+                    .Take(100)
+                    .ToListAsync();
         }
 
         public async Task<EmailLog?> GetByIdAsync(Guid id)
         {
             return await _context.EmailLogs.FindAsync(id);
-        }
-
-        public async Task<List<EmailLog>> GetPendingEmailsAsync(int maxRetryCount)
-        {
-            return await _context.EmailLogs
-                .Where(x =>
-                    !x.IsSent &&
-                    x.RetryCount < maxRetryCount &&
-                    x.NextRetryAt <= DateTime.UtcNow)
-                .OrderBy(x => x.NextRetryAt)
-                .Take(100)
-                .ToListAsync();
         }
     }
 }

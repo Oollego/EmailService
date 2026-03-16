@@ -6,9 +6,20 @@ namespace EmailService.Domain.Services
     public class EmailDomainService
     {
         // Например, логика подготовки письма для отправки
-        public EmailLog CreateEmailLog(EmailAddress to, string subject, EmailBody body)
+        public EmailLog CreateEmailLog(
+            EmailAddress to,
+            string subject,
+            EmailBody body,
+            string? idempotencyKey = null)
         {
-            return new EmailLog(to.ToString(), subject, body.ToString());
+            var log = new EmailLog(to.Value, subject, body.Value);
+
+            if (!string.IsNullOrEmpty(idempotencyKey))
+            {
+                log.SetIdempotencyKey(idempotencyKey);
+            }
+
+            return log;
         }
 
         // Можно добавить методы проверки Idempotency, генерации токена и т.д.
