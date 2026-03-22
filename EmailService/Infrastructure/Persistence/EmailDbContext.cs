@@ -41,6 +41,13 @@ namespace EmailService.Infrastructure.Persistence
 
             builder.Property(x => x.NextRetryAt);
 
+            builder.Property(x => x.IdempotencyKey)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            builder.HasIndex(x => x.IdempotencyKey)
+                .IsUnique();
+
             builder.HasIndex(x => x.NextRetryAt);
             builder.HasIndex(x => x.CreatedAt);
             builder.HasIndex(x => x.IsSent);

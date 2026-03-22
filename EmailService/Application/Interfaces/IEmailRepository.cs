@@ -16,5 +16,7 @@ namespace EmailService.Application.Interfaces
 
         Task<EmailLog?> GetByIdAsync(Guid id);
 
+        Task UpdateErrorMessageAsync(EmailLog log);
+
     }
 }

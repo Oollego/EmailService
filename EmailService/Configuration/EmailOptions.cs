@@ -12,6 +12,8 @@
         /// </summary>
         public int MaxRetryCount { get; set; } = 3;
 
+        public int RetryIntervalSeconds { get; set; } = 10;
+
         /// <summary>
         /// Default From address
         /// </summary>

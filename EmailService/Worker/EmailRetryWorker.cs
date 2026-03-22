@@ -29,10 +29,13 @@ namespace EmailService.Worker
 
                 foreach (var email in emails)
                 {
-                    await processor.ProcessRetryAsync(email);
+                    if (email.NextRetryAt.HasValue && email.NextRetryAt.Value <= DateTime.UtcNow)
+                    {
+                        await processor.ProcessRetryAsync(email);
+                    }
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(_options.RetryIntervalSeconds), stoppingToken);
             }
         }
     }
