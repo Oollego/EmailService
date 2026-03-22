@@ -4,6 +4,7 @@ using EmailService.Contracts.Message;
 using EmailService.Domain.Entities;
 using EmailService.Domain.Services;
 using EmailService.Domain.ValueObjects;
+using EmailService.Worker;
 
 namespace EmailService.Application.Services
 {
@@ -11,16 +12,19 @@ namespace EmailService.Application.Services
     {
         private readonly IEnumerable<IEmailHandler> _handlers;
         private readonly IEmailRepository _emailRepository;
-        private readonly EmailDomainService _emailDomainService;
+        private readonly IEmailSendService _emailService;
+        private readonly ILogger<EmailWorker> _logger;
 
         public EmailProcessorService(
             IEnumerable<IEmailHandler> handlers,
             IEmailRepository emailRepository,
-            EmailDomainService emailDomainService)
+            IEmailSendService emailService,
+            ILogger<EmailWorker> logger)
         {
             _handlers = handlers;
             _emailRepository = emailRepository;
-            _emailDomainService = emailDomainService;
+            _emailService = emailService;
+            _logger = logger;
         }
 
         public async Task ProcessAsync(EmailMessage message)
@@ -29,6 +33,7 @@ namespace EmailService.Application.Services
 
             if (!string.IsNullOrEmpty(messageId) && await _emailRepository.ExistsByIdempotencyKeyAsync(messageId))
             {
+                _logger.LogInformation("Duplicate message {Key}, skipping", messageId);
                 return;
             }
 
@@ -39,19 +44,21 @@ namespace EmailService.Application.Services
             try
             {
                 log = await handler.HandleAsync(message);
+
+                await _emailRepository.AddAsync(log);
+
+                await _emailService.SendAsync(log);
+
+                await _emailRepository.MarkSentAsync(log.Id);
             }
             catch (Exception ex)
             {
-                log = _emailDomainService.CreateEmailLog(
-                    new EmailAddress(message.To),
-                    message.Template,
-                    new EmailBody(ex.Message)
-                );
+                log = EmailDomainService.CreateEmailLogFromMessage(message);
 
                 log.IncrementRetry(ex.Message);
-            }
 
-            await _emailRepository.AddAsync(log);
+                await _emailRepository.UpdateErrorMessageAsync(log);
+            }
         }
 
         public async Task ProcessRetryAsync(EmailLog log)
@@ -60,10 +67,13 @@ namespace EmailService.Application.Services
             {
                 var handler = _handlers.First(x => x.Type == EmailType.Transactional);
                 await handler.SendExistingAsync(log);
+
+                log.MarkSent();
                 await _emailRepository.MarkSentAsync(log.Id);
             }
             catch (Exception ex)
             {
+                log.IncrementRetry(ex.Message);
                 await _emailRepository.IncrementRetryAsync(log.Id, ex.Message);
             }
         }

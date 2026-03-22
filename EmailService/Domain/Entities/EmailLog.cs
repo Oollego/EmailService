@@ -20,9 +20,9 @@
 
         public DateTime? NextRetryAt { get; private set; }
 
-        public string? IdempotencyKey { get; private set; }
+        public string IdempotencyKey { get; private set; }
 
-        public EmailLog(string to, string subject, string body, string? idempotencyKey = null)
+        public EmailLog(string to, string subject, string body, string idempotencyKey)
         {
             Id = Guid.NewGuid();
             To = to;
