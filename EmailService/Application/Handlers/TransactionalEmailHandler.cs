@@ -11,20 +11,17 @@ namespace EmailService.Application.Handlers
     {
         public EmailType Type => EmailType.Transactional;
 
-        private readonly IEmailSendService _emailService;
-        private readonly IEmailRepository _emailRepository;
+        private readonly ITemplateRenderer _renderer;
 
-        public TransactionalEmailHandler(IEmailSendService emailService, IEmailRepository repository)
+        public TransactionalEmailHandler(ITemplateRenderer renderer)
         {
-            _emailService = emailService;
-            _emailRepository = repository;
+           _renderer = renderer;
         }
 
         public async Task<EmailLog> HandleAsync(EmailMessage message)
         {
             
 
-            ///Перенести шаблон в Handler или подумать еще как сделать
             string body = RenderTemplate(message.Template, message.Data);
 
             var log = EmailDomainService.CreateEmailLogFromMessage(message, body);
@@ -32,18 +29,18 @@ namespace EmailService.Application.Handlers
             return log;
         }
 
-        private string RenderTemplate(string template, Dictionary<string, string> data)
+        private async Task<string> RenderTemplateAsync(EmailMessage message)
         {
-            // 🔹 Можно интегрировать любой TemplateRenderer
-            foreach (var kvp in data)
-                template = template.Replace($"{{{{{kvp.Key}}}}}", kvp.Value);
+            
+            var model = new WelcomeEmailModel
+            {
+                Name = message.Data["Name"] // пример
+            };
 
-            return template;
-        }
+            // Рендерим шаблон
+            string body = await _renderer.RenderAsync("Transactional.cshtml", model);
 
-        public async Task SendExistingAsync(EmailLog log)
-        {
-           await _emailService.SendAsync(log);
+            return EmailDomainService.CreateEmailLogFromMessage(message, body);
         }
     }
 }

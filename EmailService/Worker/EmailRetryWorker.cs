@@ -9,11 +9,13 @@ namespace EmailService.Worker
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly EmailOptions _options;
+        private readonly ILogger<EmailRetryWorker> _logger;
 
-        public EmailRetryWorker(IServiceScopeFactory scopeFactory, IOptions<EmailOptions> options)
+        public EmailRetryWorker(IServiceScopeFactory scopeFactory, IOptions<EmailOptions> options, ILogger<EmailRetryWorker> logger)
         {
             _scopeFactory = scopeFactory;
             _options = options.Value;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,11 +29,17 @@ namespace EmailService.Worker
 
                 var emails = await repository.GetPendingEmailsAsync(_options.MaxRetryCount);
 
+                _logger.LogInformation("RetryWorker: found {Count} emails", emails.Count);
+
                 foreach (var email in emails)
                 {
-                    if (email.NextRetryAt.HasValue && email.NextRetryAt.Value <= DateTime.UtcNow)
+                    try
                     {
                         await processor.ProcessRetryAsync(email);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Retry failed for email {Id}", email.Id);
                     }
                 }
 

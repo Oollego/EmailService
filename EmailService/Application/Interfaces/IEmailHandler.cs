@@ -10,6 +10,5 @@ namespace EmailService.Application.Interfaces
 
         Task<EmailLog> HandleAsync(EmailMessage message);
 
-        Task SendExistingAsync(EmailLog log);
     }
 }
