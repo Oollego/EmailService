@@ -15,6 +15,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="RazorLight" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,7 +25,6 @@
     <Folder Include="Domain\Events\" />
     <Folder Include="Infrastructure\EmailProviders\" />
     <Folder Include="Infrastructure\Logging\" />
-    <Folder Include="Infrastructure\Templates\" />
   </ItemGroup>
 
 </Project>
