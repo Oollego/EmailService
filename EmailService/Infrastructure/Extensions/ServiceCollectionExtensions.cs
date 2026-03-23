@@ -3,8 +3,10 @@ using EmailService.Application.Interfaces;
 using EmailService.Application.Services;
 using EmailService.Configuration;
 using EmailService.Infrastructure.Persistence;
+using EmailService.Infrastructure.Templates;
 using EmailService.Worker;
 using Microsoft.EntityFrameworkCore;
+using RazorLight;
 
 namespace EmailService.Infrastructure.Extensions
 {
@@ -20,6 +22,9 @@ namespace EmailService.Infrastructure.Extensions
                 options.UseSqlServer(configuration.GetConnectionString("EmailDb")));
 
             services.AddHostedService<EmailRetryWorker>();
+
+            services.AddSingleton<IRazorTemplateRenderer, RazorTemplateRenderer>();
+            services.AddSingleton<ITemplateResolver, TemplateResolver>();
 
             services.AddScoped<IEmailSendService, EmailSendService>();
 

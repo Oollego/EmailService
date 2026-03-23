@@ -1,0 +1,23 @@
+﻿@model EmailService.Application.Models.TransactionalModel
+
+@{
+    Layout = "Layouts/_Layout.cshtml";
+}
+
+
+<p class="text">
+    Hello <strong>@Model.UserName</strong>,
+</p>
+
+<p class="text">
+    @Model.Message
+</p>
+
+@if (!string.IsNullOrEmpty(Model.ActionUrl))
+{
+    <p style="text-align:center;">
+        <a href="@Model.ActionUrl" class="btn">
+            @Model.ActionText
+        </a>
+    </p>
+}

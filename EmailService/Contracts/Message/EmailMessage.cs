@@ -17,5 +17,7 @@ namespace EmailService.Contracts.Message
         public Dictionary<string, string> Data { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; }
+
+        public string? language { get; set; }
     }
 }

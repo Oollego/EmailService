@@ -1,9 +1,10 @@
 ﻿using EmailService.Application.Interfaces;
 using RazorLight;
+using PreMailer.Net;
 
 namespace EmailService.Infrastructure.Templates
 {
-    public class RazorTemplateRenderer : ITemplateRenderer
+    public class RazorTemplateRenderer : IRazorTemplateRenderer
     {
         private readonly RazorLightEngine _engine;
 
@@ -17,7 +18,9 @@ namespace EmailService.Infrastructure.Templates
 
         public async Task<string> RenderAsync<T>(string templateName, T model)
         {
-            return await _engine.CompileRenderAsync(templateName, model);
+            string html = await _engine.CompileRenderAsync(templateName, model);
+
+            return PreMailer.Net.PreMailer.MoveCssInline(html).Html;
         }
     }
 }
