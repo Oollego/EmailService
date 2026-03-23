@@ -1,6 +1,7 @@
 ﻿using EmailService.Application.Interfaces;
 using EmailService.Application.Services;
 using EmailService.Configuration;
+using EmailService.Domain.Entities;
 using Microsoft.Extensions.Options;
 
 namespace EmailService.Worker
@@ -25,11 +26,30 @@ namespace EmailService.Worker
                 using var scope = _scopeFactory.CreateScope();
 
                 var repository = scope.ServiceProvider.GetRequiredService<IEmailRepository>();
-                var processor = scope.ServiceProvider.GetRequiredService<EmailProcessorService>();
+                var processor = scope.ServiceProvider.GetRequiredService<IEmailProcessorService>();
 
-                var emails = await repository.GetPendingEmailsAsync(_options.MaxRetryCount);
+                List<EmailLog> emails;
 
-                _logger.LogInformation("RetryWorker: found {Count} emails", emails.Count);
+                try
+                {
+                    emails = await repository.GetPendingEmailsAsync(_options.MaxRetryCount);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "RetryWorker: database error while fetching emails");
+
+                    await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+                    continue;
+                }
+
+                if (emails.Count == 0)
+                {
+                    _logger.LogInformation("RetryWorker: no emails to retry");
+                }
+                else
+                {
+                    _logger.LogInformation("RetryWorker: found {Count} emails", emails.Count);
+                }
 
                 foreach (var email in emails)
                 {
@@ -39,11 +59,19 @@ namespace EmailService.Worker
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Retry failed for email {Id}", email.Id);
+                        _logger.LogError(ex, "RetryWorker: retry failed for email {Id}", email.Id);
+
                     }
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(_options.RetryIntervalSeconds), stoppingToken);
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(_options.RetryIntervalSeconds), stoppingToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    break;
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ namespace EmailService.Application.Handlers
             var link = $"https://site.com/verify?token={token}";
             var body = $"Verify your email: {link}";
 
-            var log = new EmailLog(message.To, message.Subject, body);
+            var log = new EmailLog(message.To, message.Subject, body, message.Id.ToString());
 
             try
             {
