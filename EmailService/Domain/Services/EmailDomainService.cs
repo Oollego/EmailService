@@ -1,7 +1,6 @@
 ﻿using EmailService.Contracts.Message;
 using EmailService.Domain.Entities;
 using EmailService.Domain.ValueObjects;
-using Microsoft.IdentityModel.Tokens;
 
 namespace EmailService.Domain.Services
 {

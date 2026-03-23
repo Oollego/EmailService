@@ -15,16 +15,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="PreMailer.Net" Version="2.7.2" />
     <PackageReference Include="RazorLight" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\DTO\" />
     <Folder Include="Application\Validators\" />
     <Folder Include="Domain\Enums\" />
     <Folder Include="Domain\Events\" />
     <Folder Include="Infrastructure\EmailProviders\" />
     <Folder Include="Infrastructure\Logging\" />
+    <Folder Include="Infrastructure\Templates\Templates\Styles\" />
   </ItemGroup>
 
 </Project>

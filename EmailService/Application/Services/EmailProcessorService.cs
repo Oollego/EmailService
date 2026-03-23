@@ -30,8 +30,6 @@ namespace EmailService.Application.Services
 
         public async Task ProcessAsync(EmailMessage message)
         {
-            var key = message.Id.ToString();
-
             var handler = _handlers.First(x => x.Type == message.Type);
 
             EmailLog log;
@@ -80,7 +78,6 @@ namespace EmailService.Application.Services
         {
             try
             {
-                //var handler = _handlers.First(x => x.Type == EmailType.Transactional);
                 await _emailService.SendAsync(log);
 
                 log.MarkSent();
