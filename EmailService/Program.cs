@@ -10,7 +10,7 @@ namespace EmailService
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            
             builder.Services.AddEmailService(builder.Configuration);
 
             builder.Services.AddControllers();

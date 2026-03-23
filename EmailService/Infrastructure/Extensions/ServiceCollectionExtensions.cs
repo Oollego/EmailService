@@ -6,6 +6,7 @@ using EmailService.Infrastructure.Persistence;
 using EmailService.Infrastructure.Templates;
 using EmailService.Worker;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RazorLight;
 
 namespace EmailService.Infrastructure.Extensions
@@ -14,22 +15,44 @@ namespace EmailService.Infrastructure.Extensions
     {
         public static IServiceCollection AddEmailService(this IServiceCollection services, IConfiguration configuration)
         {
+            // Options
             services.Configure<EmailOptions>(configuration.GetSection("EmailOptions"));
             services.Configure<SmtpOptions>(configuration.GetSection("Smtp"));
             services.Configure<ServiceBusOptions>(configuration.GetSection("ServiceBus"));
+            services.Configure<TemplateOptions>(configuration.GetSection("Templates"));
 
+
+            // DbContext
             services.AddDbContext<EmailDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("EmailDb")));
 
-            services.AddHostedService<EmailRetryWorker>();
+            // Repositories
+            services.AddScoped<IEmailRepository, EmailRepository>();
 
+            // Email Processor
+            services.AddScoped<IEmailProcessorService, EmailProcessorService>();
+
+            // Email send service
+            services.AddScoped<IEmailSendService, EmailSendService>();
+
+            // Email Handlers
+            services.AddScoped<IEmailHandler, TransactionalEmailHandler>();
+            services.AddScoped<IEmailHandler, VerificationEmailHandler>();
+
+            // Templates (Singleton)
             services.AddSingleton<IRazorTemplateRenderer, RazorTemplateRenderer>();
             services.AddSingleton<ITemplateResolver, TemplateResolver>();
 
-            services.AddScoped<IEmailSendService, EmailSendService>();
+            // ServiceBusClient (Singleton)
+            services.AddSingleton(sp =>
+            {
+                var options = sp.GetRequiredService<IOptions<ServiceBusOptions>>().Value;
+                return new Azure.Messaging.ServiceBus.ServiceBusClient(options.ConnectionString);
+            });
 
-            services.AddScoped<IEmailHandler, TransactionalEmailHandler>();
-            services.AddScoped<IEmailHandler, VerificationEmailHandler>();
+            // Hosted Services
+            services.AddHostedService<EmailRetryWorker>();
+            services.AddHostedService<EmailWorker>();
 
             return services;
         }

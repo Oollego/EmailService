@@ -46,7 +46,7 @@ namespace EmailService.Worker
         {
             using var scope = _scopeFactory.CreateScope();
 
-            var processor = scope.ServiceProvider.GetRequiredService<IEmailProcessorService>();
+            var emailProcessor = scope.ServiceProvider.GetRequiredService<IEmailProcessorService>();
 
             EmailMessage message;
 
@@ -63,7 +63,7 @@ namespace EmailService.Worker
 
             try
             {
-                await processor.ProcessAsync(message);
+                await emailProcessor.ProcessAsync(message);
 
                 await args.CompleteMessageAsync(args.Message);
             }
