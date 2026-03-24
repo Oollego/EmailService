@@ -1,6 +1,7 @@
 ﻿using EmailService.Application.DTO;
 using EmailService.Application.Interfaces;
 using EmailService.Application.Models;
+using EmailService.Contracts.Enums;
 using Microsoft.AspNetCore.Mvc;
 using RazorLight;
 
@@ -22,14 +23,14 @@ namespace EmailService.Controllers
         [HttpPost("preview")]
         public async Task<IActionResult> Preview([FromBody] EmailPreviewRequest request)
         {
-            var template = _resolver.ResolveTemplate(request.Type, request.Language);
+            var template = _resolver.ResolveTemplate((EmailType)Enum.Parse(typeof(EmailType), request.Type), request.Language);
 
             var model = new TransactionalModel
             {
                 UserName = request.Data.GetValueOrDefault("Name", "Test User"),
                 Title = request.Subject,
                 Message = request.Data.GetValueOrDefault("Message", "Test message"),
-                ActionUrl = request.Data.GetValueOrDefault("Url"),
+                ActionUrl = request.Data.GetValueOrDefault("Url") ?? "https://unil.ink/",
                 ActionText = "Open",
                 CreatedAt = DateTime.UtcNow
             };
@@ -46,11 +47,11 @@ namespace EmailService.Controllers
 //        POST /api/email/preview
 
 //{
-//  "type": "Transactional",
+//    "type": "Transactional",
 //  "language": "en",
 //  "subject": "Confirm your email",
 //  "data": {
-//    "Name": "Oleg",
+//        "Name": "Oleg",
 //    "Message": "Please confirm your email",
 //    "Url": "https://your-app.com/confirm"
 //  }
