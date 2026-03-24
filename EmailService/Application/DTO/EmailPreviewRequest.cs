@@ -4,7 +4,7 @@ namespace EmailService.Application.DTO
 {
     public class EmailPreviewRequest
     {
-        public EmailType Type { get; set; }
+        public string Type { get; set; } = null!;
 
         public string Language { get; set; } = "en";
 

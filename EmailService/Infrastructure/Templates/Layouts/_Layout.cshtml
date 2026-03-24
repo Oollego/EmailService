@@ -11,6 +11,7 @@
         body, table, td, a {
             -webkit-text-size-adjust: 100%;
             -ms-text-size-adjust: 100%;
+            margin-top: 20px;
         }
 
         table, td {
@@ -45,20 +46,31 @@
         }
 
         .btn {
-            background: #4CAF50;
+                background: #5069e9;
             color: #ffffff !important;
             padding: 12px 20px;
             text-decoration: none;
             border-radius: 5px;
             display: inline-block;
-            font-size: 14px;
+            font-size: 16px;
+            font-stretch: wider;
+            font-weight: bold;
+            width: 100px;
         }
 
         .footer {
-            font-size: 12px;
+            font-size: 13px;
             color: #999;
             text-align: center;
             padding: 15px;
+            font-weight: bold;
+        }
+
+        .header {
+            background: linear-gradient( 84deg, #CA55F3 -2.71%, #FF53A5 31.8%, #FF763C 81.33%, #FFF859 104.15% );
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
         }
 
         @@media only screen and (max-width: 600px) {
@@ -100,7 +112,7 @@
 
                 <!-- HEADER -->
                 <tr>
-                    <td style="background:#4CAF50;padding:20px;text-align:center;">
+                    <td class="header">
                         <span class="title">@Model.Title</span>
                     </td>
                 </tr>
@@ -115,7 +127,7 @@
                 <!-- FOOTER -->
                 <tr>
                     <td class="footer">
-                        © 2026 Your Company
+                        © 2026 UNILINK
                     </td>
                 </tr>
 
