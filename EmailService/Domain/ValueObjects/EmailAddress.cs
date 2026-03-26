@@ -17,6 +17,8 @@ namespace EmailService.Domain.ValueObjects
             {
                 throw new ArgumentException("Email is not valid");
             }
+
+            Value = email;
         }
 
         private bool IsValid(string email)

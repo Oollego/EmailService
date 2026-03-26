@@ -18,16 +18,25 @@ namespace EmailService.Domain.Services
             return log;
         }
 
-        public static EmailLog CreateEmailLogFromMessage(EmailMessage message, string? body = null)
+        public static EmailLog CreateEmailLogFromMessage(EmailMessage message, string body)
         {
-            EmailBody emailBody = new EmailBody(string.IsNullOrEmpty(body) ? message.Template : body);
+            var idempotencyKey = (message.Id == Guid.Empty) ? Guid.NewGuid().ToString() : message.Id.ToString();
 
-            return CreateEmailLog(new EmailAddress(message.To), message.Subject, emailBody, message.Id.ToString());
+            EmailBody emailBody = new EmailBody(body);
+
+            return CreateEmailLog(new EmailAddress(message.To), message.Subject, emailBody, idempotencyKey);
         }
 
-            // Можно добавить методы проверки Idempotency, генерации токена и т.д.
-            //Любая бизнес-логика EmailService, которая не привязана к конкретному Handler
-            //Служит "чистым" слоем между Entities и Application
-            //DomainService → EmailDomainService (бизнес-логика на уровне домена, независимая от инфраструктуры)
+        //public static EmailLog CreateEmailLogFromMessage(EmailMessage message, string? body = null)
+        //{
+        //    EmailBody emailBody = new EmailBody(string.IsNullOrEmpty(body) ? message.Template : body);
+
+        //    return CreateEmailLog(new EmailAddress(message.To), message.Subject, emailBody, message.Id.ToString());
+        //}
+
+        // Можно добавить методы проверки Idempotency, генерации токена и т.д.
+        //Любая бизнес-логика EmailService, которая не привязана к конкретному Handler
+        //Служит "чистым" слоем между Entities и Application
+        //DomainService → EmailDomainService (бизнес-логика на уровне домена, независимая от инфраструктуры)
     }
 }

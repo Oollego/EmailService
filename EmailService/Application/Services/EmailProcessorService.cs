@@ -30,6 +30,10 @@ namespace EmailService.Application.Services
 
         public async Task ProcessAsync(EmailMessage message)
         {
+            _logger.LogInformation("Looking for handler for type: {Type}", message.Type);
+
+            _logger.LogInformation("Registered handlers: {Handlers}", string.Join(", ", _handlers.Select(h => h.Type)));
+
             var handler = _handlers.First(x => x.Type == message.Type);
 
             EmailLog log;
@@ -40,7 +44,7 @@ namespace EmailService.Application.Services
             }
             catch (Exception ex)
             {
-                log = EmailDomainService.CreateEmailLogFromMessage(message);
+                log = EmailDomainService.CreateEmailLogFromMessage(message, "Transient");
                 log.IncrementRetry(ex.Message);
 
                 await _emailRepository.AddAsync(log);

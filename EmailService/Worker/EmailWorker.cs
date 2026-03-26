@@ -1,10 +1,11 @@
-﻿using System.Text.Json;
-using Azure.Messaging.ServiceBus;
+﻿using Azure.Messaging.ServiceBus;
 using EmailService.Application.Interfaces;
 using EmailService.Configuration;
 using EmailService.Contracts.Message;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace EmailService.Worker
 {
@@ -50,9 +51,16 @@ namespace EmailService.Worker
 
             EmailMessage message;
 
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            options.Converters.Add(new JsonStringEnumConverter());
+
             try
             {
-                message = JsonSerializer.Deserialize<EmailMessage>(args.Message.Body)!;
+                message = JsonSerializer.Deserialize<EmailMessage>(args.Message.Body, options)!;
             }
             catch (Exception ex)
             {
