@@ -1,7 +1,7 @@
-﻿@model EmailService.Application.Models.TransactionalModel
+﻿@model EmailService.Application.Models.Verification.VerificationModel
 
 @{
-    Layout = "Layouts/_Layout.cshtml";
+    Layout = "Layouts/_LayoutVerification.cshtml";
 }
 
 
@@ -17,7 +17,7 @@
 {
     <p style="text-align:center;">
         <a href="@Model.ActionUrl" class="btn">
-            @Model.ActionText
+            @Model.ButtonText
         </a>
     </p>
 }

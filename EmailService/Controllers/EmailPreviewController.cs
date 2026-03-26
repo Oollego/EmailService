@@ -1,6 +1,6 @@
 ﻿using EmailService.Application.DTO;
 using EmailService.Application.Interfaces;
-using EmailService.Application.Models;
+using EmailService.Application.Models.Verification;
 using EmailService.Contracts.Enums;
 using Microsoft.AspNetCore.Mvc;
 using RazorLight;
@@ -8,7 +8,7 @@ using RazorLight;
 namespace EmailService.Controllers
 {
     [ApiController]
-    [Route("api/email")]
+    [Route("api/email/preview")]
     public class EmailPreviewController : ControllerBase
     {
         private readonly IRazorTemplateRenderer _renderer;
@@ -20,18 +20,18 @@ namespace EmailService.Controllers
             _resolver = resolver;
         }
 
-        [HttpPost("preview")]
+        [HttpPost("verification")]
         public async Task<IActionResult> Preview([FromBody] EmailPreviewRequest request)
         {
             var template = _resolver.ResolveTemplate((EmailType)Enum.Parse(typeof(EmailType), request.Type), request.Language);
 
-            var model = new TransactionalModel
+            var model = new VerificationModel
             {
                 UserName = request.Data.GetValueOrDefault("Name", "Test User"),
                 Title = request.Subject,
                 Message = request.Data.GetValueOrDefault("Message", "Test message"),
                 ActionUrl = request.Data.GetValueOrDefault("Url") ?? "https://unil.ink/",
-                ActionText = "Open",
+                ButtonText = "Open",
                 CreatedAt = DateTime.UtcNow
             };
 

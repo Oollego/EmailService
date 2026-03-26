@@ -2,7 +2,7 @@
 {
     public enum EmailType
     {
-        Transactional,
-        EmailVerification
+        Transaction,
+        Verification
     }
 }

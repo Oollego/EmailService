@@ -3,11 +3,13 @@ using EmailService.Application.Interfaces;
 using EmailService.Application.Services;
 using EmailService.Configuration;
 using EmailService.Infrastructure.Persistence;
+using EmailService.Infrastructure.ServiceBus;
 using EmailService.Infrastructure.Templates;
 using EmailService.Worker;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using RazorLight;
+using System.Text.Json.Serialization;
 
 namespace EmailService.Infrastructure.Extensions
 {
@@ -21,6 +23,10 @@ namespace EmailService.Infrastructure.Extensions
             services.Configure<ServiceBusOptions>(configuration.GetSection("ServiceBus"));
             services.Configure<TemplateOptions>(configuration.GetSection("Templates"));
 
+            services.Configure<JsonOptions>(options =>
+            {
+                options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             // DbContext
             services.AddDbContext<EmailDbContext>(options =>
@@ -36,8 +42,8 @@ namespace EmailService.Infrastructure.Extensions
             services.AddScoped<IEmailSendService, EmailSendService>();
 
             // Email Handlers
-            services.AddScoped<IEmailHandler, TransactionalEmailHandler>();
-            services.AddScoped<IEmailHandler, VerificationEmailHandler>();
+            services.AddScoped<IEmailHandler, TransactionHandler>();
+            services.AddScoped<IEmailHandler, VerificationHandler>();
 
             // Templates (Singleton)
             services.AddSingleton<IRazorTemplateRenderer, RazorTemplateRenderer>();
@@ -49,6 +55,9 @@ namespace EmailService.Infrastructure.Extensions
                 var options = sp.GetRequiredService<IOptions<ServiceBusOptions>>().Value;
                 return new Azure.Messaging.ServiceBus.ServiceBusClient(options.ConnectionString);
             });
+
+            //ServiceBus
+            services.AddScoped<IMessageBus, ServiceBusPublisher>();
 
             // Hosted Services
             services.AddHostedService<EmailRetryWorker>();

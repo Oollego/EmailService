@@ -9,6 +9,5 @@ namespace EmailService.Application.Interfaces
         EmailType Type { get; }
 
         Task<EmailLog> HandleAsync(EmailMessage message);
-
     }
 }

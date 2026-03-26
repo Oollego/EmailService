@@ -17,7 +17,11 @@ namespace EmailService
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            builder.Services.AddSwaggerForDevelopment(builder.Environment);
+
             var app = builder.Build();
+
+            app.UseSwaggerForDevelopment(app.Environment);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

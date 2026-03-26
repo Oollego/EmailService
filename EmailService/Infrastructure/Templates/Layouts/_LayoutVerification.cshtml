@@ -1,6 +1,6 @@
-﻿@using EmailService.Application.Models
+﻿@using EmailService.Application.Models.Verification
 
-@model EmailBaseModel
+@model VerificationBaseModel
 
 <!DOCTYPE html>
 <html>
@@ -46,7 +46,7 @@
         }
 
         .btn {
-                background: #5069e9;
+            background: #5069e9;
             color: #ffffff !important;
             padding: 12px 20px;
             text-decoration: none;
@@ -55,7 +55,7 @@
             font-size: 16px;
             font-stretch: wider;
             font-weight: bold;
-            width: 100px;
+            min-width: 100px;
         }
 
         .footer {
@@ -67,7 +67,9 @@
         }
 
         .header {
-            background: linear-gradient( 84deg, #CA55F3 -2.71%, #FF53A5 31.8%, #FF763C 81.33%, #FFF859 104.15% );
+/*             background: linear-gradient( 84deg, #CA55F3 -2.71%, #FF53A5 31.8%, #FF763C 81.33%, #FFF859 104.15% );
+             */ 
+            background: #FF53A5;
             padding: 20px;
             text-align: center;
             font-weight: bold;
@@ -120,7 +122,7 @@
                 <!-- BODY -->
                 <tr>
                     <td style="padding:30px;">
-                        @RenderBody()
+                        @RenderBody();
                     </td>
                 </tr>
 
