@@ -11,6 +11,14 @@ SQL Server (EmailLog)
 ↓
 EmailRetryWorker (on failure)
 
+
+
+**Layers:**
+- `Controllers` — REST endpoints (publish to bus, preview templates)
+- `Application` — handlers, services, interfaces
+- `Domain` — `EmailLog` entity with retry scheduling logic
+- `Infrastructure` — EF Core, Service Bus, Razor templates, SMTP
+
 ## Features
 
 - **Azure Service Bus** — decoupled async message consumption
@@ -53,12 +61,13 @@ POST /api/email/bus/send
   "idempotencyKey": "unique-request-id"
 }
 Email Types
-Type	        Description	                                     Fields
-Verification	Email confirmation	                             UserName, Title, Message, ActionUrl, ButtonText
-Transaction	  Transaction notification	                       UserName, Title, Message, Code
-
+Type	Description	Template Fields
+Verification	Email confirmation	UserName, Title, Message, ActionUrl, ButtonText
+Transaction	Transaction notification	UserName, Title, Message, Code
 Retry Logic
 Failed emails are rescheduled automatically:
+
+
 Attempt 1 → wait 1 min  → Attempt 2
 Attempt 2 → wait 5 min  → Attempt 3
 Attempt 3 → wait 15 min → Attempt 4
@@ -134,3 +143,4 @@ EmailService/
 └── Worker/
     ├── EmailWorker.cs        # Service Bus queue consumer
     └── EmailRetryWorker.cs   # Retry scheduler
+
